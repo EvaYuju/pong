@@ -4,9 +4,9 @@
 # d) Dentro de la ventana del juego (no en el marco de la aplicación), encima del marcador, aparecerá la leyenda
 # "Juego de Ping-Pong"
 # OK e) El movimiento del jugador contrario no depende de nuestra voluntad
-# f) El marcador aparecerá en la parte superior de la cancha dibujada
+# OK f) El marcador aparecerá en la parte superior de la cancha dibujada
 # OK g) No aparecerá ninguna variable o función escrita en inglés
-# h) No hay problema en utilizar en este caso variables globales
+# OK h) No hay problema en utilizar en este caso variables globales
 # i) Los sonidos suministrados deben asociarse al golpeo con la pala, a un tanto que sube al marcador, un rebote
 # contra pared, comienzo de partida y ganador/perdedor de partida. Todos ellos pueden ser cambiados al gusto si
 # se quiere
@@ -26,17 +26,26 @@ reloj = pygame.time.Clock()  # Método reloj
 # Función de movimiento de bola
 def animacion_bola():
     # Vbles globales
-    global velocidad_bola_x, velocidad_bola_y
+    global velocidad_bola_x, velocidad_bola_y, puntos_jugador, puntos_oponente
 
     # Movimiento bola
     bola.x += velocidad_bola_x
     bola.y += velocidad_bola_y
     # Detector de colisiones bola VS bordes
+    # Si la bola es ≤ 0 y está el límite en los bordes
     if bola.top <= 0 or bola.bottom >= pantalla_alto:  # vertical
         velocidad_bola_y *= -1
-    if bola.left <= 0 or bola.right >= pantalla_ancho:  # horizontal
-        #  Velocidad_bola_x *= -1 // Sustituimos la línea que invierte la velocidad de la bola por una que la resetea :
+
+    if bola.left <= 0:
+        puntos_jugador += 1
         resetear_bola()
+    if bola.right >= pantalla_ancho:  # horizontal
+        #  // Velocidad_bola_x *= -1
+        #  Sustituimos la línea que invierte la velocidad de la bola por una que la resetea:
+        resetear_bola()
+        puntos_oponente += 1
+
+
     # Detector de colisiones bola VS paletas
     if bola.colliderect(jugador) or bola.colliderect(oponente):
         velocidad_bola_x *= -1
@@ -101,12 +110,10 @@ velocidad_jugador = 0
 velocidad_oponente = 7
 
 # Variables de texto:
-Puntos_jugador = 0
-Puntos_oponente = 0
+puntos_jugador = 0
+puntos_oponente = 0
 #                                                (Nombre fuente, tamaño)
 Fuente_1 = pygame.font.Font(pygame.font.match_font("Goldman-Regular.ttf"), 32)
-
-
 
 # Bucle (donde ejecutaremos las funciones):
 while True:
@@ -138,10 +145,11 @@ while True:
     pygame.draw.ellipse(pantalla, colorGris, bola)  # Dibujo bola
     pygame.draw.aaline(pantalla, colorGris, (pantalla_ancho / 2, 0), (pantalla_ancho / 2, pantalla_alto))
 
-    texto_jugador = Fuente_1.render(f"{Puntos_jugador}", False, colorGris)  # Escribe puntos jugador
-    pantalla.blit(texto_jugador, (500, 340))  # Superficie para colocar el texto sobre la superficie anterior.
-
-    #texto_oponente
+    texto_jugador = Fuente_1.render(f"{puntos_jugador}", False, colorGris)  # Escribe puntos jugador
+    #                             ( variable a recoger, false/true, color )
+    pantalla.blit(texto_jugador, (500, 40))  # Superficie para colocar el texto sobre la superficie anterior.
+    texto_oponente = Fuente_1.render(f"{puntos_oponente}", False, colorGris)  # Escribe puntos oponente
+    pantalla.blit(texto_oponente, (450, 40))  # Superficie para colocar el texto sobre la superficie anterior.
 
     # Updating the Window
     pygame.display.flip()
