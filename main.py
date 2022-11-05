@@ -3,16 +3,17 @@
 # OK c) Palas de 10 pixels de ancho por 100 de alto
 # d) Dentro de la ventana del juego (no en el marco de la aplicación), encima del marcador, aparecerá la leyenda
 # "Juego de Ping-Pong"
-# e) El movimiento del jugador contrario no depende de nuestra voluntad
+# OK e) El movimiento del jugador contrario no depende de nuestra voluntad
 # f) El marcador aparecerá en la parte superior de la cancha dibujada
-# g) No aparecerá ninguna variable o función escrita en inglés
+# OK g) No aparecerá ninguna variable o función escrita en inglés
 # h) No hay problema en utilizar en este caso variables globales
 # i) Los sonidos suministrados deben asociarse al golpeo con la pala, a un tanto que sube al marcador, un rebote
 # contra pared, comienzo de partida y ganador/perdedor de partida. Todos ellos pueden ser cambiados al gusto si
 # se quiere
 # j) El tipo de letra a usar para los textos será Goldman-Regular.ttf
-# k) El código escrito en Python debe estar trufado de comentarios detallados con objeto de que otro desarrollador
+# OK k) El código escrito en Python debe estar trufado de comentarios detallados con objeto de que otro desarrollador
 # pueda entenderlo de una sola lectura
+import random
 
 import pygame
 import sys
@@ -34,10 +35,46 @@ def animacion_bola():
     if bola.top <= 0 or bola.bottom >= pantalla_alto:  # vertical
         velocidad_bola_y *= -1
     if bola.left <= 0 or bola.right >= pantalla_ancho:  # horizontal
-        velocidad_bola_x *= -1
+        #  Velocidad_bola_x *= -1 // Sustituimos la línea que invierte la velocidad de la bola por una que la resetea :
+        resetear_bola()
     # Detector de colisiones bola VS paletas
     if bola.colliderect(jugador) or bola.colliderect(oponente):
         velocidad_bola_x *= -1
+
+
+# Función de movimiento de la paleta del jugador
+def animacion_jugador():
+    # Constantes paleta
+    jugador.y += velocidad_jugador
+    # Condición si la paleta del jugador toca el borde superior o inferior
+    if jugador.top <= 0:
+        jugador.top = 0
+    if jugador.bottom >= pantalla_alto:
+        jugador.bottom = pantalla_alto
+
+
+# Función de movimiento de la paleta del oponente
+def animacion_oponente():
+    # Movimiento paleta:
+    if oponente.top < bola.y:
+        oponente.top += velocidad_oponente
+    if oponente.bottom > bola.y:
+        oponente.bottom -= velocidad_oponente
+    # Controlar tocar borde superior/inferior
+    if oponente.top <= 0:
+        oponente.top = 0
+    if oponente.bottom >= pantalla_alto:
+        oponente.bottom = pantalla_alto
+
+
+# Función resetear bola :
+def resetear_bola():
+    # Vbles globales bola
+    global velocidad_bola_x, velocidad_bola_y
+    bola.center = (pantalla_ancho/2, pantalla_alto/2)
+    # Aumento de velocidad al perder
+    velocidad_bola_y *= random.choice((1, -1))
+    velocidad_bola_x *= random.choice((1, -1))
 
 
 # Creación de ventana (Tamaño, titulo):
@@ -57,11 +94,11 @@ oponente = pygame.Rect(10, pantalla_alto / 2 - 70, 10, 100)
 colorFondo = pygame.Color('grey12')
 colorGris = (200, 200, 200)
 
-# Variables movimiento objetos:
-velocidad_bola_x = 7
-velocidad_bola_y = 7
+# Variables de movimiento objetos:
+velocidad_bola_x = 7 * random.choice((1, -1))
+velocidad_bola_y = 7 * random.choice((1, -1))
 velocidad_jugador = 0
-# velocidad_oponente = 0
+velocidad_oponente = 7
 
 # Bucle (donde ejecutaremos las funciones):
 while True:
@@ -70,14 +107,21 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()  # Cerrar el juego una vez termina
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN:   # Eventos de teclado para manejar la paleta del jugador
             if event.key == pygame.K_DOWN:
-                velocidad_jugador +=7
+                velocidad_jugador += 7
             if event.key == pygame.K_UP:
-                velocidad_jugador -=7
-    # Hemos movido la función definida al principio y ahora la llamamos en el bucle
+                velocidad_jugador -= 7
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_DOWN:
+                velocidad_jugador -= 7
+            if event.key == pygame.K_UP:
+                velocidad_jugador += 7
+
+    # Hemos movido las funciones definidas al principio y las llamamos en el bucle
     animacion_bola()
-    jugador.y += velocidad_jugador
+    animacion_jugador()
+    animacion_oponente()
 
     # Visuals / Dibujos *** Importante orden , se dibujan en orden por encima de los anteriores ***
     pantalla.fill(colorFondo)  # Añadimos color al fondo
