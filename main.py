@@ -10,7 +10,7 @@
 # i) Los sonidos suministrados deben asociarse al golpeo con la pala, a un tanto que sube al marcador, un rebote
 # contra pared, comienzo de partida y ganador/perdedor de partida. Todos ellos pueden ser cambiados al gusto si
 # se quiere
-# j) El tipo de letra a usar para los textos será Goldman-Regular.ttf
+# OK j) El tipo de letra a usar para los textos será Goldman-Regular.ttf
 # OK k) El código escrito en Python debe estar trufado de comentarios detallados con objeto de que otro desarrollador
 # pueda entenderlo de una sola lectura
 import random
@@ -71,7 +71,7 @@ def animacion_oponente():
 def resetear_bola():
     # Vbles globales bola
     global velocidad_bola_x, velocidad_bola_y
-    bola.center = (pantalla_ancho/2, pantalla_alto/2)
+    bola.center = (pantalla_ancho / 2, pantalla_alto / 2)
     # Aumento de velocidad al perder
     velocidad_bola_y *= random.choice((1, -1))
     velocidad_bola_x *= random.choice((1, -1))
@@ -100,6 +100,14 @@ velocidad_bola_y = 7 * random.choice((1, -1))
 velocidad_jugador = 0
 velocidad_oponente = 7
 
+# Variables de texto:
+Puntos_jugador = 0
+Puntos_oponente = 0
+#                                                (Nombre fuente, tamaño)
+Fuente_1 = pygame.font.Font(pygame.font.match_font("Goldman-Regular.ttf"), 32)
+
+
+
 # Bucle (donde ejecutaremos las funciones):
 while True:
     # zona inputs
@@ -107,7 +115,7 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()  # Cerrar el juego una vez termina
-        if event.type == pygame.KEYDOWN:   # Eventos de teclado para manejar la paleta del jugador
+        if event.type == pygame.KEYDOWN:  # Eventos de teclado para manejar la paleta del jugador
             if event.key == pygame.K_DOWN:
                 velocidad_jugador += 7
             if event.key == pygame.K_UP:
@@ -129,6 +137,11 @@ while True:
     pygame.draw.rect(pantalla, colorGris, oponente)  # dibujo paleta oponente
     pygame.draw.ellipse(pantalla, colorGris, bola)  # Dibujo bola
     pygame.draw.aaline(pantalla, colorGris, (pantalla_ancho / 2, 0), (pantalla_ancho / 2, pantalla_alto))
+
+    texto_jugador = Fuente_1.render(f"{Puntos_jugador}", False, colorGris)  # Escribe puntos jugador
+    pantalla.blit(texto_jugador, (500, 340))  # Superficie para colocar el texto sobre la superficie anterior.
+
+    #texto_oponente
 
     # Updating the Window
     pygame.display.flip()
