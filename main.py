@@ -1,13 +1,13 @@
 # OK a) Cancha de 960 pixels de ancho por 720 de alto
 # OK b) Pelota de 25 pixels de ancho y alto
 # OK c) Palas de 10 pixels de ancho por 100 de alto
-# d) Dentro de la ventana del juego (no en el marco de la aplicación), encima del marcador, aparecerá la leyenda
+# OK d) Dentro de la ventana del juego (no en el marco de la aplicación), encima del marcador, aparecerá la leyenda
 # "Juego de Ping-Pong"
 # OK e) El movimiento del jugador contrario no depende de nuestra voluntad
 # OK f) El marcador aparecerá en la parte superior de la cancha dibujada
 # OK g) No aparecerá ninguna variable o función escrita en inglés
 # OK h) No hay problema en utilizar en este caso variables globales
-# i) Los sonidos suministrados deben asociarse al golpeo con la pala, a un tanto que sube al marcador, un rebote
+# 1/2 OK i) Los sonidos suministrados deben asociarse al golpeo con la pala, a un tanto que sube al marcador, un rebote
 # contra pared, comienzo de partida y ganador/perdedor de partida. Todos ellos pueden ser cambiados al gusto si
 # se quiere
 # OK j) El tipo de letra a usar para los textos será Goldman-Regular.ttf
@@ -19,6 +19,7 @@ import sys
 
 # Configuración general
 pygame.mixer.pre_init(44100, -16, 2, 512)  # (freq 44100 x def., -16 x def., canal 2 x def., tamaño buffer lo reducimos)
+pygame.font.init()
 pygame.init()  # Inicializa los módulos pygame y es requerido para cualquier tipo de juego
 reloj = pygame.time.Clock()  # Método reloj
 
@@ -105,14 +106,14 @@ def resetear_bola():
     bola.center = (pantalla_ancho / 2, pantalla_alto / 2)
 
     if hora_actual - tiempoPuntaje < 700:
-        tres = Fuente_1.render("3", False, colorGris)
-        pantalla.blit(tres, (pantalla_ancho / 2 - 15, pantalla_alto / 2 + 20))
+        tres = miFuente.render("3", False, colorGris)
+        pantalla.blit(tres, (pantalla_ancho / 2 - 5, pantalla_alto / 2 + 20))
     if 700 < hora_actual - tiempoPuntaje < 1400:
-        dos = Fuente_1.render("2", False, colorGris)
-        pantalla.blit(dos, (pantalla_ancho / 2 - 15, pantalla_alto / 2 + 20))
+        dos = miFuente.render("2", False, colorGris)
+        pantalla.blit(dos, (pantalla_ancho / 2 - 5, pantalla_alto / 2 + 20))
     if 1400 < hora_actual - tiempoPuntaje < 2100:
-        uno = Fuente_1.render("1", False, colorGris)
-        pantalla.blit(uno, (pantalla_ancho / 2 - 15, pantalla_alto / 2 + 20))
+        uno = miFuente.render("1", False, colorGris)
+        pantalla.blit(uno, (pantalla_ancho / 2 - 5, pantalla_alto / 2 + 20))
 
     if hora_actual - tiempoPuntaje < 2100:
         velocidad_bola_x, velocidad_bola_y = 0, 0
@@ -120,7 +121,7 @@ def resetear_bola():
         velocidad_bola_y = 5 * random.choice((1, -1))
         velocidad_bola_x = 5 * random.choice((1, -1))
         # Aumento de velocidad al perder
-        tiempoPuntaje = None
+        tiempoPuntaje = False  # En vez de None
 
 
 # Creación de ventana (Tamaño, titulo):
@@ -150,12 +151,15 @@ velocidad_oponente = 7
 puntos_jugador = 0
 puntos_oponente = 0
 #                                                (Nombre fuente, tamaño)
-Fuente_1 = pygame.font.Font(pygame.font.match_font("Goldman-Regular.ttf"), 32)
+miFuente = pygame.font.Font(pygame.font.match_font("Goldman-Regular.ttf"), 32)
+miTitulo = miFuente.render("- Juego de Ping-Pong -", 50, colorGris)
 
 # Sonidos
 sonido_pong = pygame.mixer.Sound("Materiales/Sonidos/pong.ogg")
 sonido_puntos = pygame.mixer.Sound("Materiales/Sonidos/score.ogg")
-
+sonido_aplausos = pygame.mixer.Sound("Materiales/Sonidos/applause4.mp3")
+sonido_tenis = pygame.mixer.Sound("Materiales/Sonidos/tennisserve.mp3")
+sonido_chof = pygame.mixer.Sound("Materiales/Sonidos/hit-arg.mp3")
 
 # Variables tiempoPuntaje:
 tiempoPuntaje = True
@@ -189,15 +193,16 @@ while True:
     pygame.draw.rect(pantalla, colorGris, oponente)  # dibujo paleta oponente
     pygame.draw.ellipse(pantalla, colorGris, bola)  # Dibujo bola
     pygame.draw.aaline(pantalla, colorGris, (pantalla_ancho / 2, 0), (pantalla_ancho / 2, pantalla_alto))
+    pantalla.blit(miTitulo, (368, 9))
 
     if tiempoPuntaje:
         resetear_bola()
 
-    texto_jugador = Fuente_1.render(f"{puntos_jugador}", False, colorGris)  # Escribe puntos jugador
+    texto_jugador = miFuente.render(f"{puntos_jugador}", False, colorGris)  # Escribe puntos jugador
     #                             ( variable a recoger, false/true, color )
-    pantalla.blit(texto_jugador, (500, 40))  # Superficie para colocar el texto sobre la superficie anterior.
-    texto_oponente = Fuente_1.render(f"{puntos_oponente}", False, colorGris)  # Escribe puntos oponente
-    pantalla.blit(texto_oponente, (450, 40))  # Superficie para colocar el texto sobre la superficie anterior.
+    pantalla.blit(texto_jugador, (500, 48))  # Superficie para colocar el texto sobre la superficie anterior.
+    texto_oponente = miFuente.render(f"{puntos_oponente}", False, colorGris)  # Escribe puntos oponente
+    pantalla.blit(texto_oponente, (450, 48))  # Superficie para colocar el texto sobre la superficie anterior.
 
     # Updating the Window
     pygame.display.flip()
