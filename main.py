@@ -26,7 +26,7 @@ reloj = pygame.time.Clock()  # Método reloj
 # Función de movimiento de bola
 def animacion_bola():
     # Vbles globales
-    global velocidad_bola_x, velocidad_bola_y, puntos_jugador, puntos_oponente
+    global velocidad_bola_x, velocidad_bola_y, puntos_jugador, puntos_oponente, tiempoPuntaje
 
     # Movimiento bola
     bola.x += velocidad_bola_x
@@ -38,13 +38,13 @@ def animacion_bola():
 
     if bola.left <= 0:
         puntos_jugador += 1
-        resetear_bola()
+        tiempoPuntaje = pygame.time.get_ticks()  # Cuanto tiempo ha estado funcionando el juego desde el inicio
+
     if bola.right >= pantalla_ancho:  # horizontal
         #  // Velocidad_bola_x *= -1
         #  Sustituimos la línea que invierte la velocidad de la bola por una que la resetea:
-        resetear_bola()
         puntos_oponente += 1
-
+        tiempoPuntaje = pygame.time.get_ticks()
 
     # Detector de colisiones bola VS paletas
     if bola.colliderect(jugador) or bola.colliderect(oponente):
@@ -79,11 +79,28 @@ def animacion_oponente():
 # Función resetear bola :
 def resetear_bola():
     # Vbles globales bola
-    global velocidad_bola_x, velocidad_bola_y
+    global velocidad_bola_x, velocidad_bola_y, tiempoPuntaje
+
+    hora_actual = pygame.time.get_ticks()
     bola.center = (pantalla_ancho / 2, pantalla_alto / 2)
-    # Aumento de velocidad al perder
-    velocidad_bola_y *= random.choice((1, -1))
-    velocidad_bola_x *= random.choice((1, -1))
+
+    if hora_actual - tiempoPuntaje < 700:
+        tres = Fuente_1.render("3", False, colorGris)
+        pantalla.blit(tres, (pantalla_ancho/2 - 15, pantalla_alto/2 + 20))
+    if 700 < hora_actual - tiempoPuntaje < 1400:
+        dos = Fuente_1.render("2", False, colorGris)
+        pantalla.blit(dos, (pantalla_ancho/2 - 15, pantalla_alto/2 + 20))
+    if 1400 < hora_actual - tiempoPuntaje < 2100:
+        uno = Fuente_1.render("1", False, colorGris)
+        pantalla.blit(uno, (pantalla_ancho/2 - 15, pantalla_alto/2 + 20))
+
+    if hora_actual - tiempoPuntaje < 2100:
+        velocidad_bola_x, velocidad_bola_y = 0, 0
+    else:
+        velocidad_bola_y = 7 * random.choice((1, -1))
+        velocidad_bola_x = 7 * random.choice((1, -1))
+        # Aumento de velocidad al perder
+        tiempoPuntaje = None
 
 
 # Creación de ventana (Tamaño, titulo):
@@ -115,6 +132,9 @@ puntos_oponente = 0
 #                                                (Nombre fuente, tamaño)
 Fuente_1 = pygame.font.Font(pygame.font.match_font("Goldman-Regular.ttf"), 32)
 
+# Variables tiempoPuntaje:
+tiempoPuntaje = True
+
 # Bucle (donde ejecutaremos las funciones):
 while True:
     # zona inputs
@@ -144,6 +164,9 @@ while True:
     pygame.draw.rect(pantalla, colorGris, oponente)  # dibujo paleta oponente
     pygame.draw.ellipse(pantalla, colorGris, bola)  # Dibujo bola
     pygame.draw.aaline(pantalla, colorGris, (pantalla_ancho / 2, 0), (pantalla_ancho / 2, pantalla_alto))
+
+    if tiempoPuntaje:
+        resetear_bola()
 
     texto_jugador = Fuente_1.render(f"{puntos_jugador}", False, colorGris)  # Escribe puntos jugador
     #                             ( variable a recoger, false/true, color )
