@@ -14,41 +14,61 @@
 # OK k) El código escrito en Python debe estar trufado de comentarios detallados con objeto de que otro desarrollador
 # pueda entenderlo de una sola lectura
 import random
-
 import pygame
 import sys
 
-# General setup / configuración general
+# Configuración general
+pygame.mixer.pre_init(44100, -16, 2, 512)  # (freq 44100 x def., -16 x def., canal 2 x def., tamaño buffer lo reducimos)
 pygame.init()  # Inicializa los módulos pygame y es requerido para cualquier tipo de juego
 reloj = pygame.time.Clock()  # Método reloj
 
 
 # Función de movimiento de bola
 def animacion_bola():
-    # Vbles globales
+    # Variables globales
     global velocidad_bola_x, velocidad_bola_y, puntos_jugador, puntos_oponente, tiempoPuntaje
 
     # Movimiento bola
     bola.x += velocidad_bola_x
     bola.y += velocidad_bola_y
+
     # Detector de colisiones bola VS bordes
     # Si la bola es ≤ 0 y está el límite en los bordes
     if bola.top <= 0 or bola.bottom >= pantalla_alto:  # vertical
+        pygame.mixer.Sound.play(sonido_pong)
         velocidad_bola_y *= -1
 
+    # Puntuación jugador
     if bola.left <= 0:
+        pygame.mixer.Sound.play(sonido_puntos)
         puntos_jugador += 1
         tiempoPuntaje = pygame.time.get_ticks()  # Cuanto tiempo ha estado funcionando el juego desde el inicio
 
+    # Puntuación oponente
     if bola.right >= pantalla_ancho:  # horizontal
+        pygame.mixer.Sound.play(sonido_puntos)
         #  // Velocidad_bola_x *= -1
         #  Sustituimos la línea que invierte la velocidad de la bola por una que la resetea:
         puntos_oponente += 1
         tiempoPuntaje = pygame.time.get_ticks()
 
     # Detector de colisiones bola VS paletas
-    if bola.colliderect(jugador) or bola.colliderect(oponente):
-        velocidad_bola_x *= -1
+    if bola.colliderect(jugador) and velocidad_bola_x > 0:
+        pygame.mixer.Sound.play(sonido_pong)
+        if abs(bola.right - jugador.left) < 10:
+            velocidad_bola_x *= -1
+        elif abs(bola.bottom - jugador.top) < 10 and velocidad_bola_y > 0:
+            velocidad_bola_y *= -1
+        elif abs(bola.top - jugador.bottom) < 10 and velocidad_bola_y < 0:
+            velocidad_bola_y *= -1
+    if bola.colliderect(oponente) and velocidad_bola_x < 0:
+        pygame.mixer.Sound.play(sonido_pong)
+        if abs(bola.left - oponente.right) < 10:
+            velocidad_bola_x *= -1
+        elif abs(bola.bottom - oponente.top) < 10 and velocidad_bola_y > 0:
+            velocidad_bola_y *= -1
+        elif abs(bola.top - oponente.bottom) < 10 and velocidad_bola_y < 0:
+            velocidad_bola_y *= -1
 
 
 # Función de movimiento de la paleta del jugador
@@ -86,19 +106,19 @@ def resetear_bola():
 
     if hora_actual - tiempoPuntaje < 700:
         tres = Fuente_1.render("3", False, colorGris)
-        pantalla.blit(tres, (pantalla_ancho/2 - 15, pantalla_alto/2 + 20))
+        pantalla.blit(tres, (pantalla_ancho / 2 - 15, pantalla_alto / 2 + 20))
     if 700 < hora_actual - tiempoPuntaje < 1400:
         dos = Fuente_1.render("2", False, colorGris)
-        pantalla.blit(dos, (pantalla_ancho/2 - 15, pantalla_alto/2 + 20))
+        pantalla.blit(dos, (pantalla_ancho / 2 - 15, pantalla_alto / 2 + 20))
     if 1400 < hora_actual - tiempoPuntaje < 2100:
         uno = Fuente_1.render("1", False, colorGris)
-        pantalla.blit(uno, (pantalla_ancho/2 - 15, pantalla_alto/2 + 20))
+        pantalla.blit(uno, (pantalla_ancho / 2 - 15, pantalla_alto / 2 + 20))
 
     if hora_actual - tiempoPuntaje < 2100:
         velocidad_bola_x, velocidad_bola_y = 0, 0
     else:
-        velocidad_bola_y = 7 * random.choice((1, -1))
-        velocidad_bola_x = 7 * random.choice((1, -1))
+        velocidad_bola_y = 5 * random.choice((1, -1))
+        velocidad_bola_x = 5 * random.choice((1, -1))
         # Aumento de velocidad al perder
         tiempoPuntaje = None
 
@@ -131,6 +151,11 @@ puntos_jugador = 0
 puntos_oponente = 0
 #                                                (Nombre fuente, tamaño)
 Fuente_1 = pygame.font.Font(pygame.font.match_font("Goldman-Regular.ttf"), 32)
+
+# Sonidos
+sonido_pong = pygame.mixer.Sound("Materiales/Sonidos/pong.ogg")
+sonido_puntos = pygame.mixer.Sound("Materiales/Sonidos/score.ogg")
+
 
 # Variables tiempoPuntaje:
 tiempoPuntaje = True
