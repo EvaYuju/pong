@@ -3,6 +3,7 @@ import pygame
 import sys
 
 # Configuración general
+
 pygame.mixer.pre_init(44100, -16, 2, 512)  # (freq 44100 x def., -16 x def., canal 2 x def., tamaño buffer lo reducimos)
 pygame.font.init()  # Inicializa el módulo font para las fuentes
 pygame.init()  # Inicializa los módulos pygame y es requerido para cualquier tipo de juego
@@ -95,10 +96,10 @@ def resetear_bola():
         pantalla.blit(tres, (pantalla_ancho / 2 - 5, pantalla_alto / 2 + 20))
     if 700 < hora_actual - tiempoPuntaje < 1400:
         dos = miFuente.render("2", False, colorGris)
-        pantalla.blit(dos, (pantalla_ancho / 2 - 5, pantalla_alto / 2 + 20))
+        pantalla.blit(dos, (pantalla_ancho / 2 - 6, pantalla_alto / 2 + 20))
     if 1400 < hora_actual - tiempoPuntaje < 2100:
         uno = miFuente.render("1", False, colorGris)
-        pantalla.blit(uno, (pantalla_ancho / 2 - 5, pantalla_alto / 2 + 20))
+        pantalla.blit(uno, (pantalla_ancho / 2 - 6, pantalla_alto / 2 + 20))
 
     if hora_actual - tiempoPuntaje < 2100:
         velocidad_bola_x, velocidad_bola_y = 0, 0
@@ -136,7 +137,7 @@ velocidad_oponente = 7
 puntos_jugador = 0
 puntos_oponente = 0
 #                                                (Nombre fuente, tamaño)
-miFuente = pygame.font.Font(pygame.font.match_font("Goldman-Regular.ttf"), 32)
+miFuente = pygame.font.Font("Materiales/Fuentes/Goldman-Regular.ttf", 32)
 miTitulo = miFuente.render(" - Juego de Ping-Pong - ", 50, 0, colorGris)
 
 # Sonidos
@@ -178,16 +179,16 @@ while True:
     pygame.draw.rect(pantalla, colorGris, oponente)  # dibujo paleta oponente
     pygame.draw.ellipse(pantalla, colorGris, bola)  # Dibujo bola
     pygame.draw.aaline(pantalla, colorGris, (pantalla_ancho / 2, 0), (pantalla_ancho / 2, pantalla_alto))
-    pantalla.blit(miTitulo, (360, 9))
+    pantalla.blit(miTitulo, (300, 9))
 
     if tiempoPuntaje:
         resetear_bola()
 
     texto_jugador = miFuente.render(f"{puntos_jugador}", False, colorGris)  # Escribe puntos jugador
     #                             ( variable a recoger, false/true, color )
-    pantalla.blit(texto_jugador, (500, 55))  # Superficie para colocar el texto sobre la superficie anterior.
+    pantalla.blit(texto_jugador, (540, 55))  # Superficie para colocar el texto sobre la superficie anterior.
     texto_oponente = miFuente.render(f"{puntos_oponente}", False, colorGris)  # Escribe puntos oponente
-    pantalla.blit(texto_oponente, (450, 55))  # Superficie para colocar el texto sobre la superficie anterior.
+    pantalla.blit(texto_oponente, (400, 55))  # Superficie para colocar el texto sobre la superficie anterior.
 
     # Updating the Window
     pygame.display.flip()
