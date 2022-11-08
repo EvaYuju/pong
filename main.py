@@ -1,25 +1,10 @@
-# OK a) Cancha de 960 pixels de ancho por 720 de alto
-# OK b) Pelota de 25 pixels de ancho y alto
-# OK c) Palas de 10 pixels de ancho por 100 de alto
-# OK d) Dentro de la ventana del juego (no en el marco de la aplicación), encima del marcador, aparecerá la leyenda
-# "Juego de Ping-Pong"
-# OK e) El movimiento del jugador contrario no depende de nuestra voluntad
-# OK f) El marcador aparecerá en la parte superior de la cancha dibujada
-# OK g) No aparecerá ninguna variable o función escrita en inglés
-# OK h) No hay problema en utilizar en este caso variables globales
-# 1/2 OK i) Los sonidos suministrados deben asociarse al golpeo con la pala, a un tanto que sube al marcador, un rebote
-# contra pared, comienzo de partida y ganador/perdedor de partida. Todos ellos pueden ser cambiados al gusto si
-# se quiere
-# OK j) El tipo de letra a usar para los textos será Goldman-Regular.ttf
-# OK k) El código escrito en Python debe estar trufado de comentarios detallados con objeto de que otro desarrollador
-# pueda entenderlo de una sola lectura
 import random
 import pygame
 import sys
 
 # Configuración general
 pygame.mixer.pre_init(44100, -16, 2, 512)  # (freq 44100 x def., -16 x def., canal 2 x def., tamaño buffer lo reducimos)
-pygame.font.init()
+pygame.font.init()  # Inicializa el módulo font para las fuentes
 pygame.init()  # Inicializa los módulos pygame y es requerido para cualquier tipo de juego
 reloj = pygame.time.Clock()  # Método reloj
 
@@ -36,18 +21,18 @@ def animacion_bola():
     # Detector de colisiones bola VS bordes
     # Si la bola es ≤ 0 y está el límite en los bordes
     if bola.top <= 0 or bola.bottom >= pantalla_alto:  # vertical
-        pygame.mixer.Sound.play(sonido_pong)
+        pygame.mixer.Sound.play(sonido_pong)  # Que suene sonido
         velocidad_bola_y *= -1
 
     # Puntuación jugador
     if bola.left <= 0:
-        pygame.mixer.Sound.play(sonido_puntos)
+        pygame.mixer.Sound.play(sonido_aplausos)  # Ponemos sonido cuando marca punto el jugador
         puntos_jugador += 1
         tiempoPuntaje = pygame.time.get_ticks()  # Cuanto tiempo ha estado funcionando el juego desde el inicio
 
     # Puntuación oponente
     if bola.right >= pantalla_ancho:  # horizontal
-        pygame.mixer.Sound.play(sonido_puntos)
+        pygame.mixer.Sound.play(sonido_chof)  # Ponemos sonido cuando marca punto el oponente
         #  // Velocidad_bola_x *= -1
         #  Sustituimos la línea que invierte la velocidad de la bola por una que la resetea:
         puntos_oponente += 1
@@ -55,7 +40,7 @@ def animacion_bola():
 
     # Detector de colisiones bola VS paletas
     if bola.colliderect(jugador) and velocidad_bola_x > 0:
-        pygame.mixer.Sound.play(sonido_pong)
+        pygame.mixer.Sound.play(sonido_tenis)
         if abs(bola.right - jugador.left) < 10:
             velocidad_bola_x *= -1
         elif abs(bola.bottom - jugador.top) < 10 and velocidad_bola_y > 0:
@@ -63,7 +48,7 @@ def animacion_bola():
         elif abs(bola.top - jugador.bottom) < 10 and velocidad_bola_y < 0:
             velocidad_bola_y *= -1
     if bola.colliderect(oponente) and velocidad_bola_x < 0:
-        pygame.mixer.Sound.play(sonido_pong)
+        pygame.mixer.Sound.play(sonido_tenis)
         if abs(bola.left - oponente.right) < 10:
             velocidad_bola_x *= -1
         elif abs(bola.bottom - oponente.top) < 10 and velocidad_bola_y > 0:
@@ -118,8 +103,8 @@ def resetear_bola():
     if hora_actual - tiempoPuntaje < 2100:
         velocidad_bola_x, velocidad_bola_y = 0, 0
     else:
-        velocidad_bola_y = 5 * random.choice((1, -1))
-        velocidad_bola_x = 5 * random.choice((1, -1))
+        velocidad_bola_y = 6 * random.choice((1, -1))
+        velocidad_bola_x = 6 * random.choice((1, -1))
         # Aumento de velocidad al perder
         tiempoPuntaje = False  # En vez de None
 
@@ -131,7 +116,7 @@ pantalla_alto = 720
 pantalla = pygame.display.set_mode((pantalla_ancho, pantalla_alto))  # display surface
 pygame.display.set_caption('Pong')
 
-# Rectángulos del juego (Game rectangles)
+# Rectángulos del juego:
 #        Pygame.Rect    (x,y,ancho,alto)
 bola = pygame.Rect(pantalla_ancho / 2 - 15, pantalla_alto / 2 - 15, 25, 25)
 jugador = pygame.Rect(pantalla_ancho - 20, pantalla_alto / 2 - 70, 10, 100)
@@ -142,8 +127,8 @@ colorFondo = pygame.Color('grey12')
 colorGris = (200, 200, 200)
 
 # Variables de movimiento objetos:
-velocidad_bola_x = 7 * random.choice((1, -1))
-velocidad_bola_y = 7 * random.choice((1, -1))
+velocidad_bola_x = 6 * random.choice((1, -1))
+velocidad_bola_y = 6 * random.choice((1, -1))
 velocidad_jugador = 0
 velocidad_oponente = 7
 
@@ -152,7 +137,7 @@ puntos_jugador = 0
 puntos_oponente = 0
 #                                                (Nombre fuente, tamaño)
 miFuente = pygame.font.Font(pygame.font.match_font("Goldman-Regular.ttf"), 32)
-miTitulo = miFuente.render("- Juego de Ping-Pong -", 50, colorGris)
+miTitulo = miFuente.render(" - Juego de Ping-Pong - ", 50, 0, colorGris)
 
 # Sonidos
 sonido_pong = pygame.mixer.Sound("Materiales/Sonidos/pong.ogg")
@@ -162,7 +147,7 @@ sonido_tenis = pygame.mixer.Sound("Materiales/Sonidos/tennisserve.mp3")
 sonido_chof = pygame.mixer.Sound("Materiales/Sonidos/hit-arg.mp3")
 
 # Variables tiempoPuntaje:
-tiempoPuntaje = True
+tiempoPuntaje = False
 
 # Bucle (donde ejecutaremos las funciones):
 while True:
@@ -173,14 +158,14 @@ while True:
             sys.exit()  # Cerrar el juego una vez termina
         if event.type == pygame.KEYDOWN:  # Eventos de teclado para manejar la paleta del jugador
             if event.key == pygame.K_DOWN:
-                velocidad_jugador += 7
+                velocidad_jugador += 6
             if event.key == pygame.K_UP:
-                velocidad_jugador -= 7
+                velocidad_jugador -= 6
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
-                velocidad_jugador -= 7
+                velocidad_jugador -= 6
             if event.key == pygame.K_UP:
-                velocidad_jugador += 7
+                velocidad_jugador += 6
 
     # Hemos movido las funciones definidas al principio y las llamamos en el bucle
     animacion_bola()
@@ -193,16 +178,16 @@ while True:
     pygame.draw.rect(pantalla, colorGris, oponente)  # dibujo paleta oponente
     pygame.draw.ellipse(pantalla, colorGris, bola)  # Dibujo bola
     pygame.draw.aaline(pantalla, colorGris, (pantalla_ancho / 2, 0), (pantalla_ancho / 2, pantalla_alto))
-    pantalla.blit(miTitulo, (368, 9))
+    pantalla.blit(miTitulo, (360, 9))
 
     if tiempoPuntaje:
         resetear_bola()
 
     texto_jugador = miFuente.render(f"{puntos_jugador}", False, colorGris)  # Escribe puntos jugador
     #                             ( variable a recoger, false/true, color )
-    pantalla.blit(texto_jugador, (500, 48))  # Superficie para colocar el texto sobre la superficie anterior.
+    pantalla.blit(texto_jugador, (500, 55))  # Superficie para colocar el texto sobre la superficie anterior.
     texto_oponente = miFuente.render(f"{puntos_oponente}", False, colorGris)  # Escribe puntos oponente
-    pantalla.blit(texto_oponente, (450, 48))  # Superficie para colocar el texto sobre la superficie anterior.
+    pantalla.blit(texto_oponente, (450, 55))  # Superficie para colocar el texto sobre la superficie anterior.
 
     # Updating the Window
     pygame.display.flip()
